@@ -20,7 +20,7 @@ jobs:
           java-version: '17'
 
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
 
       - name: Install Android SDK
         run: |
@@ -31,6 +31,35 @@ jobs:
           rm -rf project
           mkdir project
           unzip -q ArrowMaze99_Android_Project.zip -d project
+
+      - name: Fix launcher icon
+        run: |
+          mkdir -p project/app/src/main/res/drawable
+
+          cat > project/app/src/main/res/drawable/ic_launcher.xml <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <vector xmlns:android="http://schemas.android.com/apk/res/android"
+              android:width="108dp"
+              android:height="108dp"
+              android:viewportWidth="108"
+              android:viewportHeight="108">
+
+              <path
+                  android:fillColor="#111111"
+                  android:pathData="M0,0h108v108h-108z" />
+
+              <path
+                  android:fillColor="#FFFFFF"
+                  android:pathData="M18,18h72v8h-72zM18,18h8v30h-8zM82,18h8v30h-8zM18,42h54v8h-54zM64,42h8v28h-8zM36,66h36v8h-36zM36,66h8v24h-8zM36,82h54v8h-54z" />
+
+              <path
+                  android:fillColor="#FF4B61"
+                  android:pathData="M24,54h26v-8l14,12 -14,12v-8h-26z" />
+          </vector>
+          EOF
+
+          echo "Launcher icon created:"
+          ls -l project/app/src/main/res/drawable/ic_launcher.xml
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
