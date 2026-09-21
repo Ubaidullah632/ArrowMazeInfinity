@@ -30,12 +30,16 @@ jobs:
           mkdir project
           unzip -q "$ZIP_FILE" -d project
 
-      - name: Set up Gradle
-  uses: gradle/actions/setup-gradle@v4
-  with:
-    gradle-version: '8.13'
+           - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
 
-- name: Build AAB
+      - name: Build AAB
+        run: |
+          PROJECT_DIR=$(find project -type f \( -name settings.gradle -o -name settings.gradle.kts \) -print -quit | xargs dirname)
+          test -n "$PROJECT_DIR"
+          gradle -p "$PROJECT_DIR" bundleRelease --no-daemon
   run: |
     PROJECT_DIR=$(find project -type f \( -name settings.gradle -o -name settings.gradle.kts \) -print -quit | xargs dirname)
     test -n "$PROJECT_DIR"
