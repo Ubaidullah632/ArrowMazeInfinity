@@ -1,3 +1,38 @@
+name: Build ArrowMazeInfinity AAB
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+
+      - name: Install Android SDK
+        run: |
+          sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Extract Android project
+        run: |
+          rm -rf project
+          mkdir project
+          unzip -q ArrowMaze99_Android_Project.zip -d project
+
       - name: Fix launcher icon
         run: |
           mkdir -p project/app/src/main/res/drawable
@@ -23,6 +58,7 @@
                   android:pathData="M24,54h26v-8l14,12 -14,12v-8h-26z" />
           </vector>
           EOF
+
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
