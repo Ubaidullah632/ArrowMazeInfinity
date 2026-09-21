@@ -35,6 +35,12 @@ jobs:
           mkdir project
           unzip -q "$ZIP_FILE" -d project
 
+      - name: Fix launcher icon
+        run: |
+          MANIFEST=$(find project -type f -path '*/app/src/main/AndroidManifest.xml' -print -quit)
+          test -n "$MANIFEST"
+          sed -i 's#@drawable/ic_launcher#@mipmap/ic_launcher#g' "$MANIFEST"
+
       - name: Build AAB
         run: |
           PROJECT_DIR=$(find project -type f \( -name settings.gradle -o -name settings.gradle.kts \) -print -quit | xargs dirname)
@@ -46,4 +52,3 @@ jobs:
         with:
           name: ArrowMazeInfinity-AAB
           path: project/**/build/outputs/bundle/release/*.aab
-          if-no-files-found: error
