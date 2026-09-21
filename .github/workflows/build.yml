@@ -23,3 +23,18 @@
                   android:pathData="M24,54h26v-8l14,12 -14,12v-8h-26z" />
           </vector>
           EOF
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+
+      - name: Build AAB
+        run: |
+          gradle -p project clean bundleRelease --no-daemon
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: ArrowMazeInfinity-AAB
+          path: project/app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
