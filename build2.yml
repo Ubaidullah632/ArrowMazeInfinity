@@ -1,0 +1,49 @@
+name: Build Arrow Maze Infinity
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.13'
+
+      - name: Extract Android project
+        run: |
+          ZIP_FILE=$(find . -maxdepth 1 -type f -name '*.zip' | head -1)
+          test -n "$ZIP_FILE"
+          mkdir project
+          unzip -q "$ZIP_FILE" -d project
+
+      - name: Build AAB
+        run: |
+          PROJECT_DIR=$(find project -type f \( -name settings.gradle -o -name settings.gradle.kts \) -print -quit | xargs dirname)
+          test -n "$PROJECT_DIR"
+          gradle -p "$PROJECT_DIR" bundleRelease --no-daemon
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: ArrowMazeInfinity-AAB
+          path: project/**/build/outputs/bundle/release/*.aab
+          if-no-files-found: error
