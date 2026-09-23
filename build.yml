@@ -32,6 +32,32 @@ jobs:
           mkdir project
           unzip -q ArrowMaze99_Android_Project.zip -d project
 
+      - name: Rename app to Arrow Maze Infinity
+        run: |
+          find project -type f \( \
+            -name "*.xml" -o \
+            -name "*.java" -o \
+            -name "*.gradle" -o \
+            -name "*.properties" -o \
+            -name "*.html" \
+          \) -print0 | while IFS= read -r -d '' file; do
+            sed -i \
+              -e 's/com\.ubaidullah\.arrowmaze99/com.ubaidullah.arrowmazeinfinity/g' \
+              -e 's/Arrow Maze 99/Arrow Maze Infinity/g' \
+              -e 's/ArrowMaze99/ArrowMazeInfinity/g' \
+              "$file"
+          done
+
+      - name: Move Java package folder
+        run: |
+          OLD="project/app/src/main/java/com/ubaidullah/arrowmaze99"
+          NEW="project/app/src/main/java/com/ubaidullah/arrowmazeinfinity"
+
+          if [ -d "$OLD" ]; then
+            mkdir -p "$(dirname "$NEW")"
+            mv "$OLD" "$NEW"
+          fi
+
       - name: Fix launcher icon
         run: |
           mkdir -p project/app/src/main/res/drawable
@@ -58,9 +84,6 @@ jobs:
           </vector>
           EOF
 
-          echo "Launcher icon created:"
-          ls -l project/app/src/main/res/drawable/ic_launcher.xml
-
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
@@ -75,3 +98,4 @@ jobs:
         with:
           name: ArrowMazeInfinity-AAB
           path: project/app/build/outputs/bundle/release/app-release.aab
+          if-no-files-found: error
